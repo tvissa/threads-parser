@@ -1,0 +1,33 @@
+# .github/workflows/threads-daily.yml
+name: Daily Threads Parser   # название задачи
+
+on:
+  schedule:                  # когда запускать
+    - cron: "0 7 * * *"      # каждый день 07:00 UTC (09:00 Paris/Moscow-2)
+  workflow_dispatch:         # плюс кнопка “Run workflow” вручную
+
+jobs:
+  run-parser:
+    runs-on: ubuntu-latest   # бесплатный Linux-контейнер
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install threads-client==0.5.2 python-telegram-bot pandas
+
+      - name: Run parser
+        env:                     # берём секреты из Settings → Secrets
+          THREADS_USERNAME: ${{ secrets.THREADS_USERNAME }}
+          THREADS_PASSWORD: ${{ secrets.THREADS_PASSWORD }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}   # опц.
+        run: python threads_parser.py
