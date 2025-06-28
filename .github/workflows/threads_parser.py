@@ -10,7 +10,7 @@ Daily Threads scraper:
 import os
 import datetime
 import pandas as pd
-from threads_client import Threads
+from threads_api import Threads
 from telegram import Bot
 from telegram.constants import ParseMode
 
