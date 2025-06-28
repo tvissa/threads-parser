@@ -1,7 +1,7 @@
 import os
 import datetime
 import pandas as pd
-from threads_api import ThreadsAPI as Threads
+from threads_api.src.threads_api import ThreadsAPI as Threads
 from telegram import Bot
 from telegram.constants import ParseMode
 
