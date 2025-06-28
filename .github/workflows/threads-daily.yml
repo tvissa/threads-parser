@@ -2,8 +2,8 @@ name: Daily Threads Parser
 
 on:
   schedule:
-    - cron: "0 7 * * *"      # каждый день в 07:00 UTC (09:00 Paris)
-  workflow_dispatch:         # кнопка «Run workflow» вручную
+    - cron: "0 7 * * *"      # каждый день в 07:00 UTC (10:00 МСК)
+  workflow_dispatch:         # ручной запуск
 
 jobs:
   run-parser:
@@ -23,11 +23,6 @@ jobs:
           pip install --upgrade pip
           pip install threads-api python-telegram-bot pandas
 
-      - name: Fetch parser script
-        run: |
-          curl -sL "https://raw.githubusercontent.com/${{ github.repository }}/main/threads_parser.py" \
-            -o threads_parser.py
-
       - name: Run parser
         env:
           THREADS_USERNAME: ${{ secrets.THREADS_USERNAME }}
@@ -36,6 +31,7 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python threads_parser.py
+
 
 
 
