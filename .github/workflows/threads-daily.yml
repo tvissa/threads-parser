@@ -24,6 +24,9 @@ jobs:
           pip install --upgrade pip
           pip install threads-api python-telegram-bot pandas
 
+      - name: DEBUG list files
+        run: ls -R
+
       - name: Run parser
         env:                     # берём секреты из Settings → Secrets
           THREADS_USERNAME: ${{ secrets.THREADS_USERNAME }}
