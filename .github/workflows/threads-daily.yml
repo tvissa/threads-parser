@@ -21,7 +21,9 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install threads-client==0.5.2 python-telegram-bot pandas
+          # ставим библиотеку сразу из GitHub
+          pip install git+https://github.com/Torantulino/threads-client.git
+          pip install python-telegram-bot pandas
 
       - name: Run parser
         env:                     # берём секреты из Settings → Secrets
