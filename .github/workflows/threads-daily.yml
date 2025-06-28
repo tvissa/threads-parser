@@ -1,9 +1,10 @@
+# .github/workflows/threads-daily.yml
 name: Daily Threads Parser
 
 on:
   schedule:
-    - cron: "0 7 * * *"      # каждый день в 07:00 UTC (10:00 МСК)
-  workflow_dispatch:         # ручной запуск
+    - cron: "0 7 * * *"      # 07:00 UTC (10:00 МСК)
+  workflow_dispatch:
 
 jobs:
   run-parser:
@@ -13,14 +14,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+      - name: Locate and move parser to root
+        run: |
+          # Ищем файл threads_parser.py и перемещаем в текущую папку
+          found=$(find . -type f -name threads_parser.py | head -n1)
+          echo "Found at: $found"
+          mv "$found" ./threads_parser.py
 
       - name: Install dependencies
         run: |
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install threads-api python-telegram-bot pandas
 
       - name: Run parser
@@ -31,7 +34,3 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python threads_parser.py
-
-
-
-
