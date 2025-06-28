@@ -1,17 +1,16 @@
-# .github/workflows/threads-daily.yml
 name: Daily Threads Parser
 
 on:
   schedule:
     - cron: "0 7 * * *"      # каждый день в 07:00 UTC (09:00 Paris)
-  workflow_dispatch:         # ручной запуск кнопкой
+  workflow_dispatch:         # кнопка «Run workflow» вручную
 
 jobs:
   run-parser:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -24,11 +23,10 @@ jobs:
           pip install --upgrade pip
           pip install threads-api python-telegram-bot pandas
 
-      - name: "DEBUG: show directory"
+      - name: Fetch parser script
         run: |
-          echo "Workspace: $GITHUB_WORKSPACE"
-          pwd
-          ls -R "$GITHUB_WORKSPACE"
+          curl -sL "https://raw.githubusercontent.com/${{ github.repository }}/main/threads_parser.py" \
+            -o threads_parser.py
 
       - name: Run parser
         env:
@@ -37,6 +35,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python "$GITHUB_WORKSPACE/threads_parser.py"
+        run: python threads_parser.py
+
 
 
