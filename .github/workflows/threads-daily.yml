@@ -1,29 +1,46 @@
-name: Telegram Test
+# .github/workflows/threads-daily.yml
+name: Daily Threads Parser
 
 on:
-  workflow_dispatch:        # запускаем вручную
+  workflow_dispatch:
   schedule:
-    - cron: "0 7 * * *"     # плюс раз в день в 07:00 UTC (10:00 МСК)
+    - cron: "0 7 * * *"      # 07:00 UTC = 10:00 МСК
 
 jobs:
-  send-test:
+  run-parser:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      # 1) Сначала чекаутим весь репо
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+      # 2) Ищем ваш скрипт и переносим в корень
+      - name: Normalize script location
+        run: |
+          # любой файл threads_parser.py переместим в текущий каталог
+          SCRIPT_PATH=$(find . -type f -name threads_parser.py | head -n1)
+          echo "Found script at: $SCRIPT_PATH"
+          # если файл найден — переместим его в рабочую папку
+          if [ -n "$SCRIPT_PATH" ]; then
+            mv "$SCRIPT_PATH" ./threads_parser.py
+          else
+            echo "Error: threads_parser.py not found!"
+            exit 1
+          fi
 
-      - name: Install telegram library
-        run: pip install python-telegram-bot
+      # 3) Устанавливаем библиотеки
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install threads-api python-telegram-bot pandas
 
-      - name: Run test script
+      # 4) Запускаем скрипт
+      - name: Run parser
         env:
+          THREADS_USERNAME: ${{ secrets.THREADS_USERNAME }}
+          THREADS_PASSWORD: ${{ secrets.THREADS_PASSWORD }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python threads_parser.py
-
